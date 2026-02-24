@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portofoliu Interactiv - Portofoliul Meu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        button {
+            padding: 8px 15px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .project {
+            background-color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+            display: none;
+        }
+        .project.active {
+            display: block;
+        }
+        .project-counter {
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+        }
+        .filter-btn {
+            background-color: #28a745;
+        }
+        .filter-btn:hover {
+            background-color: #1e7e34;
+        }
+        .filter-btn.active {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <h1>Portofoliu Interactiv</h1>
+    
+    <nav>
+        <ul>
+            <li><a href="index.html">Acasă Principală</a></li>
+            <li><a href="acasa.html">Acasă (Info)</a></li>
+            <li><a href="despre.html">Despre Mine</a></li>
+            <li><a href="lucrari.html">Lucrări</a></li>
+            <li><a href="portofoliu.html">Portofoliu Interactiv</a></li>
+        </ul>
+    </nav>
+    
+    <section>
+        <h2>Navigare prin Proiecte</h2>
+        
+        <div>
+            <label>Filtrare dupa categorie:</label>
+            <button class="filter-btn active" onclick="filterProjects('all')">Toate</button>
+            <button class="filter-btn" onclick="filterProjects('visual')">Arta Vizuala</button>
+            <button class="filter-btn" onclick="filterProjects('design')">Design</button>
+            <button class="filter-btn" onclick="filterProjects('fotografie')">Fotografie</button>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <button onclick="previousProject()">← Anterior</button>
+            <button onclick="nextProject()">Urmator →</button>
+            <button onclick="resetProjects()">Resetare</button>
+        </div>
+        
+        <!-- Project 1 -->
+        <div class="project active" data-category="visual">
+            <h3>Proiect 1: Serii de Acuarele</h3>
+            <p><strong>Categorie:</strong> Arta Vizuala</p>
+            <p><strong>Descriere:</strong> O serie de 5 acuarele cu teme inspirate din architectura moldoveneasca.</p>
+            <p><strong>An:</strong> 2024</p>
+            <p><strong>Materiaal:</strong> Acuarela pe hartie 300g</p>
+        </div>
+        
+        <!-- Project 2 -->
+        <div class="project" data-category="design">
+            <h3>Proiect 2: Identitate Vizuala - ONG</h3>
+            <p><strong>Categorie:</strong> Design</p>
+            <p><strong>Descriere:</strong> Logo, culori si guidelines pentru organizatie nonprofit din Chisinau.</p>
+            <p><strong>An:</strong> 2024</p>
+            <p><strong>Software:</strong> Adobe Illustrator</p>
+        </div>
+        
+        <!-- Project 3 -->
+        <div class="project" data-category="fotografie">
+            <h3>Proiect 3: Portrete Urbane</h3>
+            <p><strong>Categorie:</strong> Fotografie</p>
+            <p><strong>Descriere:</strong> Serie de fotografii in alb-negru cu streetphotography din Chisinau.</p>
+            <p><strong>An:</strong> 2024</p>
+            <p><strong>Camera:</strong> Canon 5D Mark IV</p>
+        </div>
+        
+        <!-- Project 4 -->
+        <div class="project" data-category="design">
+            <h3>Proiect 4: Branding Cafenea Locala</h3>
+            <p><strong>Categorie:</strong> Design</p>
+            <p><strong>Descriere:</strong> Logo, ambalaj si design de interior concept pentru o cafenea indie.</p>
+            <p><strong>An:</strong> 2023</p>
+            <p><strong>Deliverables:</strong> Logo, packaging, menu design</p>
+        </div>
+        
+        <!-- Project 5 -->
+        <div class="project" data-category="visual">
+            <h3>Proiect 5: Expozitie "Mosaic Moldavian"</h3>
+            <p><strong>Categorie:</strong> Arta Vizuala</p>
+            <p><strong>Descriere:</strong> Instalatie multimediala prezentand motive traditionale moldovenesti in context contemporan.</p>
+            <p><strong>An:</strong> 2023</p>
+            <p><strong>Locatie:</strong> Galeria Nationala, Chisinau</p>
+        </div>
+        
+        <div class="project-counter">
+            <p>Total proiecte: <span id="total-count">5</span> | Proiect curent: <span id="current-count">1</span></p>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Artist. Toate drepturile rezervate.</p>
+    </footer>
+
+    <script>
+        let currentProject = 0;
+        let visibleProjects = [];
+        let currentFilter = 'all';
+
+        function getProjects() {
+            return document.querySelectorAll('.project');
+        }
+
+        function updateVisibleProjects() {
+            const projects = getProjects();
+            visibleProjects = [];
+            projects.forEach((project, index) => {
+                const category = project.getAttribute('data-category');
+                if (currentFilter === 'all' || category === currentFilter) {
+                    visibleProjects.push(index);
+                }
+            });
+            currentProject = 0;
+            showProject();
+        }
+
+        function showProject() {
+            const projects = getProjects();
+            projects.forEach(p => p.classList.remove('active'));
+            
+            if (visibleProjects.length > 0) {
+                const projectIndex = visibleProjects[currentProject];
+                projects[projectIndex].classList.add('active');
+                document.getElementById('current-count').textContent = currentProject + 1;
+                document.getElementById('total-count').textContent = visibleProjects.length;
+            }
+        }
+
+        function nextProject() {
+            if (visibleProjects.length > 0) {
+                currentProject = (currentProject + 1) % visibleProjects.length;
+                showProject();
+            }
+        }
+
+        function previousProject() {
+            if (visibleProjects.length > 0) {
+                currentProject = (currentProject - 1 + visibleProjects.length) % visibleProjects.length;
+                showProject();
+            }
+        }
+
+        function filterProjects(category) {
+            currentFilter = category;
+            updateVisibleProjects();
+            
+            // Update button colors
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function resetProjects() {
+            currentFilter = 'all';
+            currentProject = 0;
+            updateVisibleProjects();
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.filter-btn')[0].classList.add('active');
+        }
+
+        // Initialize
+        updateVisibleProjects();
+    </script>
+</body>
+</html>
