@@ -78,11 +78,12 @@
                   <input type="password" id="password" class="form-control" required placeholder="******">
               </div>
               <div style="display: flex; gap: 10px;">
-                  <button type="submit" class="btn btn-primary mt-4">Logare</button>
-                  <button type="button" class="btn btn-secondary mt-4" style="width: 100%; border: none; background: #666; color: white;">Autentificare</button>
+                  <button type="submit" id="btnLogin" class="btn btn-primary mt-4">Logare</button>
+                  <button type="button" id="btnRegister" class="btn btn-secondary mt-4" style="width: 100%; border: none; background: #666; color: white;">Autentificare</button>
               </div>
           </form>
           <p id="errorMsg" style="color:red; display:none; text-align: center; margin-top: 15px; font-weight: bold;">Date incorecte!</p>
+          <p id="successMsg" style="color:green; display:none; text-align: center; margin-top: 15px; font-weight: bold;">Cont creat cu succes!</p>
       </div>
     </div>
   </section>
@@ -91,17 +92,76 @@
 </main>
 
 <script>
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const loginForm = document.getElementById('loginForm');
+    const btnRegister = document.getElementById('btnRegister');
+    const btnLogin = document.getElementById('btnLogin');
+    const errorMsg = document.getElementById('errorMsg');
+    const successMsg = document.getElementById('successMsg');
+
+    function showError(msg) {
+        successMsg.style.display = 'none';
+        errorMsg.textContent = msg;
+        errorMsg.style.display = 'block';
+        setTimeout(() => { errorMsg.style.display = 'none'; }, 3000);
+    }
+
+    function showSuccess(msg) {
+        errorMsg.style.display = 'none';
+        successMsg.textContent = msg;
+        successMsg.style.display = 'block';
+        setTimeout(() => { successMsg.style.display = 'none'; }, 3000);
+    }
+
+    // Logare (Login)
+    loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        var usr = document.getElementById('username').value.trim();
-        var pwd = document.getElementById('password').value.trim();
+        const email = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
         
-        if(usr === 'ilie.cornos@iis.utm.md' && pwd === 'cs123123') {
-            localStorage.setItem('isAuthenticated', 'true');
-            window.location.href = 'index.html';
-        } else {
-            document.getElementById('errorMsg').style.display = 'block';
-            setTimeout(() => { document.getElementById('errorMsg').style.display = 'none'; }, 3000);
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if(response.ok) {
+                localStorage.setItem('isAuthenticated', 'true');
+                window.location.href = 'index.html';
+            } else {
+                const data = await response.json();
+                showError(data.error || 'Autentificare eșuată!');
+            }
+        } catch (err) {
+            showError('Eroare conexiune la server.');
+        }
+    });
+
+    // Autentificare (Înregistrare)
+    btnRegister.addEventListener('click', async function() {
+        const email = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if (!email || !password) {
+            showError('Introduceți email și parolă pentru a vă autentifica nouă!');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if(response.ok) {
+                showSuccess('Datele au fost salvate! Puteți acum să vă logați.');
+            } else {
+                const data = await response.json();
+                showError(data.error || 'Eroare la salvare!');
+            }
+        } catch (err) {
+            showError('Eroare conexiune la server.');
         }
     });
 </script>
