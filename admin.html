@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Panel</title>
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<style>
+body { background: #f4f6f9; color: #333; font-family: sans-serif; padding-top: 50px; }
+.panel-container { max-width: 900px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+.header-box { border-bottom: 2px solid #eee; margin-bottom: 20px; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+#adminLoginBox { max-width: 400px; margin: 50px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+#dashboardBox { display: none; }
+h2 { margin: 0; }
+table th { background: #222; color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- Login Section -->
+<div id="adminLoginBox">
+    <h2 class="mb-4 text-center">Login Administrator</h2>
+    <form id="adminForm">
+        <div class="form-group mb-3">
+            <label for="adminUser">Utilizator</label>
+            <input type="text" id="adminUser" class="form-control" required placeholder="Admin">
+        </div>
+        <div class="form-group mb-3">
+            <label for="adminPass">Parolă</label>
+            <input type="password" id="adminPass" class="form-control" required placeholder="cs123123">
+        </div>
+        <button type="submit" class="btn btn-dark w-100">Logare</button>
+    </form>
+    <p id="adminError" class="text-danger text-center mt-3" style="display:none; font-weight:bold;"></p>
+</div>
+
+<!-- Dashboard Section -->
+<div id="dashboardBox" class="panel-container">
+    <div class="header-box">
+        <h2>📊 Panou Administrator</h2>
+        <button id="logoutBtn" class="btn btn-danger btn-sm">Ieșire</button>
+    </div>
+    
+    <h4>Lista Conturilor înregistrate</h4>
+    <table class="table table-bordered table-striped mt-3">
+        <thead>
+            <tr>
+                <th width="10%">ID</th>
+                <th width="50%">Email (Login)</th>
+                <th width="40%">Parolă</th>
+            </tr>
+        </thead>
+        <tbody id="usersTableBody">
+            <!-- Date incarcate din JS -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const adminForm = document.getElementById('adminForm');
+    const loginBox = document.getElementById('adminLoginBox');
+    const dashboardBox = document.getElementById('dashboardBox');
+    const adminError = document.getElementById('adminError');
+    const tbody = document.getElementById('usersTableBody');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    let adminToken = localStorage.getItem('adminToken');
+
+    async function loadUsers() {
+        try {
+            const res = await fetch('/api/admin/users', {
+                headers: { 'Authorization': adminToken }
+            });
+            if(res.ok) {
+                const users = await res.json();
+                tbody.innerHTML = '';
+                users.forEach(u => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${u.id}</td>
+                            <td><strong>${u.email}</strong></td>
+                            <td><span style="font-family: monospace;">${u.password}</span></td>
+                        </tr>
+                    `;
+                });
+                loginBox.style.display = 'none';
+                dashboardBox.style.display = 'block';
+            } else {
+                logout();
+            }
+        } catch (e) {
+            logout();
+        }
+    }
+
+    if (adminToken) {
+        loadUsers();
+    }
+
+    adminForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('adminUser').value.trim();
+        const password = document.getElementById('adminPass').value.trim();
+
+        try {
+            const res = await fetch('/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                adminToken = data.token;
+                localStorage.setItem('adminToken', adminToken);
+                loadUsers();
+            } else {
+                const data = await res.json();
+                adminError.textContent = data.error || 'Eroare de autentificare!';
+                adminError.style.display = 'block';
+            }
+        } catch (err) {
+            adminError.textContent = 'Eroare server.';
+            adminError.style.display = 'block';
+        }
+    });
+
+    logoutBtn.addEventListener('click', logout);
+
+    function logout() {
+        localStorage.removeItem('adminToken');
+        adminToken = null;
+        dashboardBox.style.display = 'none';
+        loginBox.style.display = 'block';
+        adminError.style.display = 'none';
+        document.getElementById('adminPass').value = '';
+    }
+</script>
+
+</body>
+</html>

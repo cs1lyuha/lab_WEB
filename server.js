@@ -63,6 +63,32 @@ app.post('/api/login', (req, res) => {
     });
 });
 
+// --- ADMIN ROUTES ---
+
+// Admin Authentication
+app.post('/api/admin/login', (req, res) => {
+    const { username, password } = req.body;
+    if (username === 'Admin' && password === 'cs123123') {
+        return res.status(200).json({ message: 'Admin autentificat', token: 'admin_token_123' });
+    }
+    return res.status(401).json({ error: 'Date incorecte pentru Admin!' });
+});
+
+// Admin Get Users
+app.get('/api/admin/users', (req, res) => {
+    // Într-un mediu de producție, acest token trebuie verificat (middleware)
+    const token = req.headers.authorization;
+    if (token !== 'admin_token_123') {
+        return res.status(403).json({ error: 'Acces interzis. Lipsă autorizație Admin.' });
+    }
+
+    db.all(`SELECT id, email, password FROM users`, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});
+// --------------------
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server rulează pe http://localhost:${PORT}`);
