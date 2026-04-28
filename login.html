@@ -1,36 +1,112 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Login | Atelier.md</title>
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<!-- Main css -->
+<link rel="stylesheet" href="css/tooplate-style.css">
+<link rel="stylesheet" href="css/lab3-pages.css">
+<style>
+/* Stilizare suplimentară pentru formularul de login */
+.login-container {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.login-container h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+}
+.login-container label {
+    font-weight: 600;
+}
+.login-container .btn-primary {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    background: #222;
+    border: none;
+    transition: 0.3s;
+}
+.login-container .btn-primary:hover {
+    background: #000;
+}
+</style>
 </head>
-<body>
-    <div class="container mt-5">
-        <h2>Autentificare</h2>
-        <form id="loginForm">
-            <div class="form-group">
-                <label>Utilizator:</label>
-                <input type="text" id="username" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>Parolă:</label>
-                <input type="password" id="password" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary mt-2">Login</button>
-        </form>
-        <p id="errorMsg" style="color:red; display:none;">Date incorecte!</p>
+<body class="inner-page" data-page="login">
+
+<header class="site-nav-wrap">
+  <div class="site-nav-inner">
+    <a href="index.html" class="brand-mark">Atelier.md</a>
+    <button class="site-nav-toggle" aria-label="Deschide meniul">Meniu</button>
+    <nav class="site-nav" aria-label="Navigare principala">
+      <a href="index.html">Acasa</a>
+      <a href="servicii.html">Servicii</a>
+      <a href="proiecte.html">Proiecte</a>
+      <a href="echipa.html">Echipa</a>
+      <a href="evenimente.html">Evenimente</a>
+      <a href="contacte.html">Contacte</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero">
+    <p class="page-kicker">Acces restricționat</p>
+    <h1>Autentificare</h1>
+    <p class="page-intro">Introduceți detaliile contului pentru a accesa platforma.</p>
+  </section>
+
+  <section class="page-content-area">
+    <div class="container">
+      <div class="login-container">
+          <form id="loginForm">
+              <div class="form-group mt-3">
+                  <label for="username">Utilizator (Email):</label>
+                  <input type="text" id="username" class="form-control" required placeholder="ilie.cornos@iis.utm.md">
+              </div>
+              <div class="form-group mt-3">
+                  <label for="password">Parolă:</label>
+                  <input type="password" id="password" class="form-control" required placeholder="******">
+              </div>
+              <button type="submit" class="btn btn-primary mt-4">Logare</button>
+          </form>
+          <p id="errorMsg" style="color:red; display:none; text-align: center; margin-top: 15px; font-weight: bold;">Date incorecte!</p>
+      </div>
     </div>
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            if(document.getElementById('username').value === 'ilie.cornos@iis.utm.md' && document.getElementById('password').value === 'cs123123') {
-                localStorage.setItem('isAuthenticated', 'true');
-                window.location.href = 'index.html';
-            } else {
-                document.getElementById('errorMsg').style.display = 'block';
-            }
-        });
-    </script>
+  </section>
+
+  <p class="page-footer">Atelier.md <span class="js-year"></span></p>
+</main>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var usr = document.getElementById('username').value.trim();
+        var pwd = document.getElementById('password').value.trim();
+        
+        if(usr === 'ilie.cornos@iis.utm.md' && pwd === 'cs123123') {
+            localStorage.setItem('isAuthenticated', 'true');
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('errorMsg').style.display = 'block';
+            setTimeout(() => { document.getElementById('errorMsg').style.display = 'none'; }, 3000);
+        }
+    });
+</script>
+
+<script src="js/jquery.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/pages.js"></script>
+<script src="js/custom.js"></script>
+
 </body>
 </html>
